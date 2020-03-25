@@ -655,17 +655,17 @@
   #define DELTA_HEIGHT 289.43             // (mm) Get this value from G33 auto calibrate
 
   // JM: From G33
-  #define DELTA_ENDSTOP_ADJ { 0.00, -0.14, -0.24 } // Get these values from G33 auto calibrate
+  #define DELTA_ENDSTOP_ADJ { 0.00, -0.17, -0.47 } // Get these values from G33 auto calibrate
 
   // Horizontal distance bridged by diagonal push rods when effector is centered.
   // JM: From G33
-  #define DELTA_RADIUS 108.67             // (mm) Get this value from G33 auto calibrate
+  #define DELTA_RADIUS 105.23             // (mm) Get this value from G33 auto calibrate
 
   // Trim adjustments for individual towers
   // tower angle corrections for X and Y tower / rotate XYZ so Z tower angle = 0
   // measured in degrees anticlockwise looking from above the printer
   // JM: From G33
-  #define DELTA_TOWER_ANGLE_TRIM { 1.12, 0.19, 1.31 } // Get these values from G33 auto calibrate
+  #define DELTA_TOWER_ANGLE_TRIM { 3.22, 1.97, -5.19 } // Get these values from G33 auto calibrate
 
   // Delta radius and diagonal rod adjustments (mm)
   //#define DELTA_RADIUS_TRIM_TOWER { 0.0, 0.0, 0.0 }
@@ -1115,19 +1115,19 @@
  */
 // JM: Measured. IR probe on to manilla folder card in low light
 //   OTE: The Z height will be highy variable
-#define NOZZLE_TO_PROBE_OFFSET { -15, -25.98, 47.7 }
+#define NOZZLE_TO_PROBE_OFFSET { -27.71, -16.00, 0 }
 
 // Most probes should stay away from the edges of the bed, but
 // with NOZZLE_AS_PROBE this can be negative for a wider probing area.
-#define MIN_PROBE_EDGE 10
+#define MIN_PROBE_EDGE 55
 
 // X and Y axis travel speed (mm/m) between probes
 // JM: Reducing speed to increase accuracy of measurements
-#define XY_PROBE_SPEED 1024
+#define XY_PROBE_SPEED 2048
 
 // Feedrate (mm/m) for the first approach when double-probing (MULTIPLE_PROBING == 2)
 // JM: Reducing speed to increase accuracy of measurements
-#define Z_PROBE_SPEED_FAST 1024
+#define Z_PROBE_SPEED_FAST 4096
 
 // Feedrate (mm/m) for the "accurate" probe of each point
 #define Z_PROBE_SPEED_SLOW (Z_PROBE_SPEED_FAST / 2)
@@ -1604,7 +1604,7 @@
  *   M501 - Read settings from EEPROM. (i.e., Throw away unsaved changes)
  *   M502 - Revert settings to "factory" defaults. (Follow with M500 to init the EEPROM.)
  */
-//#define EEPROM_SETTINGS     // Persistent storage with M500 and M501
+#define EEPROM_SETTINGS     // Persistent storage with M500 and M501
 //#define DISABLE_M503        // Saves ~2700 bytes of PROGMEM. Disable for release!
 #define EEPROM_CHITCHAT       // Give feedback on EEPROM commands. Disable to save PROGMEM.
 #if ENABLED(EEPROM_SETTINGS)
