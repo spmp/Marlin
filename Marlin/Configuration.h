@@ -482,22 +482,10 @@
   #define PID_FUNCTIONAL_RANGE 10 // If the temperature difference between the target temperature and the actual temperature
                                   // is more than PID_FUNCTIONAL_RANGE then the PID will be shut off and the heater will be set to min/max.
 
-  // If you are using a pre-configured hotend then you can use one of the value sets by uncommenting it
-
-  // Ultimaker
-  #define DEFAULT_Kp 22.2
-  #define DEFAULT_Ki 1.08
-  #define DEFAULT_Kd 114
-
-  // MakerGear
-  //#define DEFAULT_Kp 7.0
-  //#define DEFAULT_Ki 0.1
-  //#define DEFAULT_Kd 12
-
-  // Mendel Parts V9 on 12V
-  //#define DEFAULT_Kp 63.0
-  //#define DEFAULT_Ki 2.25
-  //#define DEFAULT_Kd 440
+  // JM: My hotend, whatever it is. Found via "M303 E C8 S210"
+  #define DEFAULT_Kp 51.34
+  #define DEFAULT_Ki 8.58
+  #define DEFAULT_Kd 76.75
 
 #endif // PIDTEMP
 
@@ -534,17 +522,11 @@
   //#define MIN_BED_POWER 0
   //#define PID_BED_DEBUG // Sends debug data to the serial port.
 
-  //120V 250W silicone heater into 4mm borosilicate (MendelMax 1.5+)
-  //from FOPDT model - kp=.39 Tp=405 Tdead=66, Tc set to 79.2, aggressive factor of .15 (vs .1, 1, 10)
-  #define DEFAULT_bedKp 10.00
-  #define DEFAULT_bedKi .023
-  #define DEFAULT_bedKd 305.4
-
-  //120V 250W silicone heater into 4mm borosilicate (MendelMax 1.5+)
-  //from pidautotune
-  //#define DEFAULT_bedKp 97.1
-  //#define DEFAULT_bedKi 1.41
-  //#define DEFAULT_bedKd 1675.16
+  // JM: Whatever heater is on the printer. Ali special.
+  // Found via autotune "M303 E-1 C8 S90"
+  #define DEFAULT_bedKp 35.20
+  #define DEFAULT_bedKi 6.93
+  #define DEFAULT_bedKd 119.17
 
   // FIND YOUR OWN: "M303 E-1 C8 S90" to run autotune on the bed at 90 degreesC for 8 cycles.
 #endif // PIDTEMPBED
@@ -652,20 +634,25 @@
 
   // Distance between bed and nozzle Z home position
   // JM: From G33
-  #define DELTA_HEIGHT 289.43             // (mm) Get this value from G33 auto calibrate
+  // G33 C0.05 P10 V2
+  // .Height:237.10  Ex:+0.00  Ey:-0.33  Ez:-0.29  Radius:107.26
+  // .               Tx:+0.46  Ty:-0.04  Tz:-0.42
+  // NOTE: Still squishing the first layer
+  // Decreasing height increases nozel from the bed at Z0
+  #define DELTA_HEIGHT 237.00           // (mm) Get this value from G33 auto calibrate + trial and error
 
   // JM: From G33
-  #define DELTA_ENDSTOP_ADJ { 0.00, -0.17, -0.47 } // Get these values from G33 auto calibrate
+  #define DELTA_ENDSTOP_ADJ { 0.00, -0.33, -0.29 } // Get these values from G33 auto calibrate
 
   // Horizontal distance bridged by diagonal push rods when effector is centered.
   // JM: From G33
-  #define DELTA_RADIUS 105.23             // (mm) Get this value from G33 auto calibrate
+  #define DELTA_RADIUS 107.25            // (mm) Get this value from G33 auto calibrate
 
   // Trim adjustments for individual towers
   // tower angle corrections for X and Y tower / rotate XYZ so Z tower angle = 0
   // measured in degrees anticlockwise looking from above the printer
   // JM: From G33
-  #define DELTA_TOWER_ANGLE_TRIM { 3.22, 1.97, -5.19 } // Get these values from G33 auto calibrate
+  #define DELTA_TOWER_ANGLE_TRIM { 0.46, -0.04, -0.42 } // Get these values from G33 auto calibrate
 
   // Delta radius and diagonal rod adjustments (mm)
   //#define DELTA_RADIUS_TRIM_TOWER { 0.0, 0.0, 0.0 }
@@ -1115,19 +1102,20 @@
  */
 // JM: Measured. IR probe on to manilla folder card in low light
 //   OTE: The Z height will be highy variable
-#define NOZZLE_TO_PROBE_OFFSET { -27.71, -16.00, 0 }
+// #define NOZZLE_TO_PROBE_OFFSET { -27.71, -16.00, 0 }
+#define NOZZLE_TO_PROBE_OFFSET { -3.464, 2.0, -4.3 }
 
 // Most probes should stay away from the edges of the bed, but
 // with NOZZLE_AS_PROBE this can be negative for a wider probing area.
-#define MIN_PROBE_EDGE 55
+#define MIN_PROBE_EDGE 7.5
 
 // X and Y axis travel speed (mm/m) between probes
 // JM: Reducing speed to increase accuracy of measurements
-#define XY_PROBE_SPEED 2048
+#define XY_PROBE_SPEED 1024
 
 // Feedrate (mm/m) for the first approach when double-probing (MULTIPLE_PROBING == 2)
 // JM: Reducing speed to increase accuracy of measurements
-#define Z_PROBE_SPEED_FAST 4096
+#define Z_PROBE_SPEED_FAST 1024
 
 // Feedrate (mm/m) for the "accurate" probe of each point
 #define Z_PROBE_SPEED_SLOW (Z_PROBE_SPEED_FAST / 2)
@@ -1141,8 +1129,8 @@
  * A total of 2 does fast/slow probes with a weighted average.
  * A total of 3 or more adds more slow probes, taking the average.
  */
-//#define MULTIPLE_PROBING 2
-//#define EXTRA_PROBING    1
+#define MULTIPLE_PROBING 3
+#define EXTRA_PROBING    1
 
 /**
  * Z probes require clearance when deploying, stowing, and moving between
