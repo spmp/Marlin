@@ -863,7 +863,10 @@
 #define XYZ_PULLEY_TEETH 20
 
 // JM: From measured calibration
-#define DEFAULT_E_STEPS_PER_UNIT 168.44776
+// For the original extruder
+//#define DEFAULT_E_STEPS_PER_UNIT 168.44776
+// For the Prusia 13 Bowden extruder
+#define DEFAULT_E_STEPS_PER_UNIT 94.87361152899788169131
 
 // delta speeds must be the same on xyz
 #define DEFAULT_XYZ_STEPS_PER_UNIT ((XYZ_FULL_STEPS_PER_ROTATION) * (XYZ_MICROSTEPS) / double(XYZ_BELT_PITCH) / double(XYZ_PULLEY_TEETH))
