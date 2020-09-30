@@ -407,7 +407,17 @@
  *   998 : Dummy Table that ALWAYS reads 25°C or the temperature defined below.
  *   999 : Dummy Table that ALWAYS reads 100°C or the temperature defined below.
  */
-#define TEMP_SENSOR_0 5
+// JM: Defs for Diamond Hotend. Defaults to J-Head
+//# define HOTEND_DIAMOND
+#ifdef HOTEND_DIAMOND
+  // Diamond hotend uses (1).
+  #define TEMP_SENSOR_0 1
+#else
+  // J-head uses (5)
+  // 5 underead by 20
+  #define TEMP_SENSOR_0 6
+#endif
+
 #define TEMP_SENSOR_1 0
 #define TEMP_SENSOR_2 0
 #define TEMP_SENSOR_3 0
@@ -438,7 +448,7 @@
 
 // Below this temperature the heater will be switched off
 // because it probably indicates a broken thermistor wire.
-#define HEATER_0_MINTEMP  -1
+#define HEATER_0_MINTEMP   1
 #define HEATER_1_MINTEMP  -1
 #define HEATER_2_MINTEMP  -1
 #define HEATER_3_MINTEMP  -1
@@ -446,12 +456,23 @@
 #define HEATER_5_MINTEMP  -1
 #define HEATER_6_MINTEMP  -1
 #define HEATER_7_MINTEMP  -1
-#define BED_MINTEMP       -1
+#define BED_MINTEMP        1
 
 // Above this temperature the heater will be switched off.
 // This can protect components from overheating, but NOT from shorts and failures.
 // (Use MINTEMP for thermistor short/failure protection.)
-#define HEATER_0_MAXTEMP 230
+// NOTE: The maximum settable temperature is 15°C lower than HEATER_X_MAXTEMP as
+// HEATER_X_MAXTEMP is a hard limit -i.e will fail the unit and shut down. 
+// hence maximum settable limit is under to allow for hysteresis.
+
+#ifdef HOTEND_DIAMOND
+  // Diamond hotend is _all metal_
+  #define HEATER_0_MAXTEMP 275
+#else
+  // J-head has PEEK parts with maximum temperature of 248
+  // Max is then 245 + 15
+  #define HEATER_0_MAXTEMP 265
+#endif
 #define HEATER_1_MAXTEMP 275
 #define HEATER_2_MAXTEMP 275
 #define HEATER_3_MAXTEMP 275
@@ -482,11 +503,17 @@
   #define PID_FUNCTIONAL_RANGE 10 // If the temperature difference between the target temperature and the actual temperature
                                   // is more than PID_FUNCTIONAL_RANGE then the PID will be shut off and the heater will be set to min/max.
 
-  // JM: My hotend, whatever it is. Found via "M303 E C8 S210"
-  #define DEFAULT_Kp 51.34
-  #define DEFAULT_Ki 8.58
-  #define DEFAULT_Kd 76.75
-
+  #ifdef HOTEND_DIAMOND
+    // Diamond hotend parameters NOT FOUND via "M303 E C8 S210"
+    #define DEFAULT_Kp 51.34
+    #define DEFAULT_Ki 8.58
+    #define DEFAULT_Kd 76.75
+  #else
+    // J-head PID parameters found via "M303 E C12 S220"
+    #define DEFAULT_Kp 43.51
+    #define DEFAULT_Ki 6.04
+    #define DEFAULT_Kd 78.41
+  #endif
 #endif // PIDTEMP
 
 //===========================================================================
@@ -541,7 +568,7 @@
  * *** IT IS HIGHLY RECOMMENDED TO LEAVE THIS OPTION ENABLED! ***
  */
 #define PREVENT_COLD_EXTRUSION
-#define EXTRUDE_MINTEMP 170
+#define EXTRUDE_MINTEMP 160
 
 /**
  * Prevent a single extrusion longer than EXTRUDE_MAXLENGTH.
@@ -566,12 +593,10 @@
  * If you get "Thermal Runaway" or "Heating failed" errors the
  * details can be tuned in Configuration_adv.h
  */
-
-#define THERMAL_PROTECTION_HOTENDS // Enable thermal protection for all extruders
-// JM: Disabled due to erronous thermal runnaway warnings
-//   Could be fixed by getting parameters right, likely due to slow heating
+// JM Disabled as keeps cutting out when heating at 240...
+// #define THERMAL_PROTECTION_HOTENDS // Enable thermal protection for all extruders
 // #define THERMAL_PROTECTION_BED     // Enable thermal protection for the heated bed
-#define THERMAL_PROTECTION_CHAMBER // Enable thermal protection for the heated chamber
+// #define THERMAL_PROTECTION_CHAMBER // Enable thermal protection for the heated chamber
 
 //===========================================================================
 //============================= Mechanical Settings =========================
@@ -630,29 +655,32 @@
 
   // Center-to-center distance of the holes in the diagonal push rods.
   // JM: 219mm rods
-  #define DELTA_DIAGONAL_ROD 219.0        // (mm)
+  // From calibrating on 100mm squares in XY, Xz, YZ
+  #define DELTA_DIAGONAL_ROD 220.06       // (mm)
 
   // Distance between bed and nozzle Z home position
   // JM: From G33
   // G33 C0.05 P10 V2
-  // .Height:237.10  Ex:+0.00  Ey:-0.33  Ez:-0.29  Radius:107.26
-  // .               Tx:+0.46  Ty:-0.04  Tz:-0.42
+  // Itterate
+  // M665 L220.06 R107.46 H237.30 X0.41 Y-0.11 Z-0.30
+  // M666 X-0.17 Y0.00 Z-0.53
+
   // NOTE: Still squishing the first layer
   // Decreasing height increases nozel from the bed at Z0
-  #define DELTA_HEIGHT 237.00           // (mm) Get this value from G33 auto calibrate + trial and error
+  #define DELTA_HEIGHT 236.80           // (mm) Get this value from G33 auto calibrate + trial and error
 
   // JM: From G33
-  #define DELTA_ENDSTOP_ADJ { 0.00, -0.33, -0.29 } // Get these values from G33 auto calibrate
+  #define DELTA_ENDSTOP_ADJ { -0.17, 0.00, -0.53 } // Get these values from G33 auto calibrate
 
   // Horizontal distance bridged by diagonal push rods when effector is centered.
   // JM: From G33
-  #define DELTA_RADIUS 107.25            // (mm) Get this value from G33 auto calibrate
+  #define DELTA_RADIUS 107.46            // (mm) Get this value from G33 auto calibrate
 
   // Trim adjustments for individual towers
   // tower angle corrections for X and Y tower / rotate XYZ so Z tower angle = 0
   // measured in degrees anticlockwise looking from above the printer
   // JM: From G33
-  #define DELTA_TOWER_ANGLE_TRIM { 0.46, -0.04, -0.42 } // Get these values from G33 auto calibrate
+  #define DELTA_TOWER_ANGLE_TRIM { 0.41, -0.11, -0.30 } // Get these values from G33 auto calibrate
 
   // Delta radius and diagonal rod adjustments (mm)
   //#define DELTA_RADIUS_TRIM_TOWER { 0.0, 0.0, 0.0 }
@@ -830,8 +858,8 @@
 //  Bodging by halving XYZ_BELT_PITCH
 //  Need to check the XYZ_MICROSTEPS set for Azteeg X3
 #define XYZ_FULL_STEPS_PER_ROTATION 200
-#define XYZ_MICROSTEPS 16
-#define XYZ_BELT_PITCH 1
+#define XYZ_MICROSTEPS 8
+#define XYZ_BELT_PITCH 2
 #define XYZ_PULLEY_TEETH 20
 
 // JM: From measured calibration
@@ -1103,7 +1131,7 @@
 // JM: Measured. IR probe on to manilla folder card in low light
 //   OTE: The Z height will be highy variable
 // #define NOZZLE_TO_PROBE_OFFSET { -27.71, -16.00, 0 }
-#define NOZZLE_TO_PROBE_OFFSET { -3.464, 2.0, -4.3 }
+#define NOZZLE_TO_PROBE_OFFSET { -3.464, 2.0, -3.44 }
 
 // Most probes should stay away from the edges of the bed, but
 // with NOZZLE_AS_PROBE this can be negative for a wider probing area.
@@ -1158,7 +1186,7 @@
 #define Z_PROBE_OFFSET_RANGE_MAX 20
 
 // Enable the M48 repeatability test to test probe accuracy
-//#define Z_MIN_PROBE_REPEATABILITY_TEST
+#define Z_MIN_PROBE_REPEATABILITY_TEST
 
 // Before deploy/stow pause for user confirmation
 //#define PAUSE_BEFORE_DEPLOY_STOW
